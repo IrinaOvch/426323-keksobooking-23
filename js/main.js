@@ -2,6 +2,7 @@ const PROPERTIES_AMOUNT = 10;
 const MAX_ROOMS_AMOUNT = 10;
 const MAX_PRICE = 1000000;
 const MAX_GUESTS_AMOUNT = 30;
+const FRACTION_DIGITS = 5;
 
 const TITLES = [
   'Уютная двушка в центре',
@@ -50,63 +51,77 @@ const PHOTOS = [
   'https://assets.htmlacademy.ru/content/intensive/javascript-1/keksobooking/claire-rendall-b6kAwr1i0Iw.jpg',
 ];
 
-function getRandomPositiveInteger (firstNumber, secondNumber) {
+const Coords = {
+  LAT: {
+    MIN: 35.65000,
+    MAX: 35.70000,
+  },
+  LNG: {
+    MIN: 139.70000,
+    MAX: 139.80000,
+  },
+};
+
+const getRandomPositiveInteger = (firstNumber, secondNumber) => {
   const lower = Math.ceil(Math.min(Math.abs(firstNumber), Math.abs(secondNumber)));
   const upper = Math.floor(Math.max(Math.abs(firstNumber), Math.abs(secondNumber)));
   const result = Math.random() * (upper - lower + 1) + lower;
 
   return Math.floor(result);
-}
+};
 
-function getRandomPositiveFloat (firstNumber, secondNumber, digits = 1) {
+const getRandomPositiveFloat = (firstNumber, secondNumber, digits = 1) => {
   const lower = Math.min(Math.abs(firstNumber), Math.abs(secondNumber));
   const upper = Math.max(Math.abs(firstNumber), Math.abs(secondNumber));
   const result = Math.random() * (upper - lower) + lower;
 
   return result.toFixed(digits);
-}
+};
 
 const getRandomArrayElement = (elements) => elements[getRandomPositiveInteger(0, elements.length - 1)];
 
 const getRandomArrayElements = (elements) => {
   const result = [];
-  for (let iteration = 0; iteration <= getRandomPositiveInteger(1, elements.length - 1); iteration++) {
+
+  for (let i = 0; i <= getRandomPositiveInteger(1, elements.length - 1); i++) {
     const item = elements[getRandomPositiveInteger(0, elements.length - 1)];
     if (!result.includes(item)) {
       result.push(item);
     }
   }
+
   return result;
 };
 
-const createProperty = (iter) => ({
-  author: {
-    avatar: `img/avatars/user${iter}.png`,
-  },
-  offer: {
-    title: getRandomArrayElement(TITLES),
-    address: `${getRandomPositiveFloat(0, 90, 5)}, ${getRandomPositiveFloat(0, 180, 5)}`,
-    price: getRandomPositiveInteger(0, MAX_PRICE),
-    type: getRandomArrayElement(TYPES),
-    rooms: getRandomPositiveInteger(0, MAX_ROOMS_AMOUNT),
-    guests: getRandomPositiveInteger(0, MAX_GUESTS_AMOUNT),
-    checkin: getRandomArrayElement(CHECKINS_AND_CHECKOUTS),
-    checkout: getRandomArrayElement(CHECKINS_AND_CHECKOUTS),
-    features: getRandomArrayElements(FEATURES),
-    description: getRandomArrayElement(DESCRIPTIONS),
-    photos: getRandomArrayElements(PHOTOS),
-  },
-  location: {
-    lat: getRandomPositiveFloat(35.65000, 35.70000, 5),
-    lng: getRandomPositiveFloat(139.70000, 139.80000, 5),
-  },
-});
+const createPropertyOffer = (iter) => {
+  const adressCoords = {
+    min: getRandomPositiveFloat(Coords.LAT.MIN, Coords.LAT.MAX, FRACTION_DIGITS),
+    max: getRandomPositiveFloat(Coords.LNG.MIN, Coords.LNG.MAX, FRACTION_DIGITS),
+  };
+
+  return {
+    author: {
+      avatar: `img/avatars/user${iter + 1 < 10 ? 0 : ''}${iter + 1}.png`,
+    },
+    offer: {
+      title: getRandomArrayElement(TITLES),
+      address: `${adressCoords.min}, ${adressCoords.max}`,
+      price: getRandomPositiveInteger(0, MAX_PRICE),
+      type: getRandomArrayElement(TYPES),
+      rooms: getRandomPositiveInteger(0, MAX_ROOMS_AMOUNT),
+      guests: getRandomPositiveInteger(0, MAX_GUESTS_AMOUNT),
+      checkin: getRandomArrayElement(CHECKINS_AND_CHECKOUTS),
+      checkout: getRandomArrayElement(CHECKINS_AND_CHECKOUTS),
+      features: getRandomArrayElements(FEATURES),
+      description: getRandomArrayElement(DESCRIPTIONS),
+      photos: getRandomArrayElements(PHOTOS),
+    },
+    location: {
+      lat: adressCoords.min,
+      lng: adressCoords.max,
+    },
+  };
+};
 
 
-const properties = new Array(PROPERTIES_AMOUNT).fill(null).map(( val, iter) => {
-  iter = iter + 1;
-  if (iter < 10) {
-    iter = `0${iter}`;
-  }
-  return createProperty(iter);
-});
+const propertyOffers = new Array(PROPERTIES_AMOUNT).fill(null).map((_, i) => createPropertyOffer(i));

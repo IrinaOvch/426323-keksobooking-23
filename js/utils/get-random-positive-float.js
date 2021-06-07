@@ -1,7 +1,7 @@
 // Функция взята из интернета и доработана
 // Источник - https://github.com/you-dont-need/You-Dont-Need-Lodash-Underscore#_random
 
-function getRandomPositiveFloat (firstNumber, secondNumber, digits = 1) {
+const getRandomPositiveFloat = (firstNumber, secondNumber, digits = 1) => {
   // Чтобы не заставлять пользователя нашей функции помнить порядок аргументов,
   // реализуем поддержку передачи минимального и максимального значения в любом порядке,
   // а какое из них большее и меньшее вычислим с помощью Math.min и Math.max
@@ -19,4 +19,6 @@ function getRandomPositiveFloat (firstNumber, secondNumber, digits = 1) {
   // И в конце с помощью метода toFixed любого числа в JavaScript
   // указать требуемое количество знаков после точки
   return result.toFixed(digits);
-}
+};
+
+getRandomPositiveFloat(2, 5, 2);
