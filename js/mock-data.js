@@ -1,7 +1,5 @@
-import {getRandomPositiveFloat} from './utils/get-random-positive-float';
-import {getRandomPositiveInteger} from './utils/get-random-positive-integer';
+import {getRandomPositiveFloat, getRandomPositiveInteger, getRandomArrayElement, getRandomArrayElements} from './utils.js';
 
-const PROPERTIES_AMOUNT = 10;
 const MAX_ROOMS_AMOUNT = 10;
 const MAX_PRICE = 1000000;
 const MAX_GUESTS_AMOUNT = 30;
@@ -65,21 +63,6 @@ const Coords = {
   },
 };
 
-const getRandomArrayElement = (elements) => elements[getRandomPositiveInteger(0, elements.length - 1)];
-
-const getRandomArrayElements = (elements) => {
-  const result = [];
-
-  for (let i = 0; i <= getRandomPositiveInteger(1, elements.length - 1); i++) {
-    const item = elements[getRandomPositiveInteger(0, elements.length - 1)];
-    if (!result.includes(item)) {
-      result.push(item);
-    }
-  }
-
-  return result;
-};
-
 const createPropertyOffer = (iter) => {
   const adressCoords = {
     min: getRandomPositiveFloat(Coords.LAT.MIN, Coords.LAT.MAX, FRACTION_DIGITS),
@@ -88,7 +71,7 @@ const createPropertyOffer = (iter) => {
 
   return {
     author: {
-      avatar: `img/avatars/user${iter + 1 < 10 ? 0 : ''}${iter + 1}.png`,
+      avatar: `img/avatars/user${`${iter + 1}`.padStart(2, '0')}.png`,
     },
     offer: {
       title: getRandomArrayElement(TITLES),
@@ -110,6 +93,6 @@ const createPropertyOffer = (iter) => {
   };
 };
 
-const propertyOffers = new Array(PROPERTIES_AMOUNT).fill(null).map((_, i) => createPropertyOffer(i));
+const createPropertyOffers = (amount) => new Array(amount).fill(null).map((_, i) => createPropertyOffer(i));
 
-export {propertyOffers};
+export {createPropertyOffers};
