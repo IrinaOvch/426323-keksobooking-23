@@ -27,4 +27,4 @@ const getRandomPositiveInteger = (firstNumber, secondNumber) => {
   return Math.floor(result);
 };
 
-getRandomPositiveInteger(4, 9);
+export {getRandomPositiveInteger};
