@@ -1,6 +1,29 @@
 // Функция взята из интернета и доработана
 // Источник - https://github.com/you-dont-need/You-Dont-Need-Lodash-Underscore#_random
 
+const getRandomPositiveFloat = (firstNumber, secondNumber, digits = 1) => {
+  // Чтобы не заставлять пользователя нашей функции помнить порядок аргументов,
+  // реализуем поддержку передачи минимального и максимального значения в любом порядке,
+  // а какое из них большее и меньшее вычислим с помощью Math.min и Math.max
+  const lower = Math.min(Math.abs(firstNumber), Math.abs(secondNumber));
+  const upper = Math.max(Math.abs(firstNumber), Math.abs(secondNumber));
+  // Обратите внимание, чтобы учесть условие, что диапазон может быть [0, ∞),
+  // мы не ругаем пользователя за переданное отрицательное число,
+  // а просто берём его по модулю с помощью Math.abs
+
+  // Дальше используем Math.random() для получения случайного дробного числа в диапазоне [0, 1),
+  // которое домножаем на разницу между переданными числами - это будет наша случайная дельта.
+  // После нужно сложить дельту с минимальным значением, чтобы получить итоговое случайное число.
+  const result = Math.random() * (upper - lower) + lower;
+
+  // И в конце с помощью метода toFixed любого числа в JavaScript
+  // указать требуемое количество знаков после точки
+  return result.toFixed(digits);
+};
+
+// Функция взята из интернета и доработана
+// Источник - https://github.com/you-dont-need/You-Dont-Need-Lodash-Underscore#_random
+
 const getRandomPositiveInteger = (firstNumber, secondNumber) => {
   // Чтобы не заставлять пользователя нашей функции помнить порядок аргументов,
   // реализуем поддержку передачи минимального и максимального значения в любом порядке,
@@ -27,4 +50,19 @@ const getRandomPositiveInteger = (firstNumber, secondNumber) => {
   return Math.floor(result);
 };
 
-export {getRandomPositiveInteger};
+const getRandomArrayElement = (elements) => elements[getRandomPositiveInteger(0, elements.length - 1)];
+
+const getRandomArrayElements = (elements) => {
+  const result = [];
+
+  for (let i = 0; i <= getRandomPositiveInteger(1, elements.length - 1); i++) {
+    const item = elements[getRandomPositiveInteger(0, elements.length - 1)];
+    if (!result.includes(item)) {
+      result.push(item);
+    }
+  }
+
+  return result;
+};
+
+export {getRandomPositiveFloat, getRandomPositiveInteger, getRandomArrayElement, getRandomArrayElements};
