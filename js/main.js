@@ -1,3 +1,4 @@
-import {createPropertyOffers} from './mock-data.js';
+import {createPropertyOffer} from './mock-data.js';
+import {renderPropertyOffer} from './render-property-offers.js';
 
-createPropertyOffers(10);
+renderPropertyOffer(createPropertyOffer());

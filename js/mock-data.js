@@ -63,7 +63,7 @@ const Coords = {
   },
 };
 
-const createPropertyOffer = (iter) => {
+const createPropertyOffer = (iter = 0) => {
   const adressCoords = {
     min: getRandomPositiveFloat(Coords.LAT.MIN, Coords.LAT.MAX, FRACTION_DIGITS),
     max: getRandomPositiveFloat(Coords.LNG.MIN, Coords.LNG.MAX, FRACTION_DIGITS),
@@ -95,4 +95,4 @@ const createPropertyOffer = (iter) => {
 
 const createPropertyOffers = (amount) => new Array(amount).fill(null).map((_, i) => createPropertyOffer(i));
 
-export {createPropertyOffers};
+export {createPropertyOffers, createPropertyOffer};
