@@ -95,4 +95,4 @@ const createPropertyOffer = (iter = 0) => {
 
 const createPropertyOffers = (amount) => new Array(amount).fill(null).map((_, i) => createPropertyOffer(i));
 
-export {createPropertyOffers, createPropertyOffer};
+export {createPropertyOffers};

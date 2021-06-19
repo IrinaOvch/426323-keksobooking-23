@@ -13,7 +13,6 @@ const GUEST_WORD_VARIATIONS = ['гостя', 'гостей', 'гостей'];
 
 const mapContainer = document.querySelector('#map-canvas');
 const cardTemplate = document.querySelector('#card').content.querySelector('.popup');
-const newCard = cardTemplate.cloneNode(true);
 
 const fillPhotos = (container, photos) => {
   const photoElementEmpty = container.querySelector('.popup__photo');
@@ -50,6 +49,7 @@ const checkNode = (card) => {
 };
 
 const fillPropertyOffer = ({author, offer}) => {
+  const newCard = cardTemplate.cloneNode(true);
   const {
     title,
     address,
@@ -82,14 +82,14 @@ const fillPropertyOffer = ({author, offer}) => {
   return newCard;
 };
 
-const renderPropertyOffer = (object) => {
-  const card = fillPropertyOffer(object);
-  checkNode(card);
-  mapContainer.appendChild(card);
-};
-
 const renderPropertyOffers = (array) => {
-  array.forEach((arrayElement) => renderPropertyOffer(arrayElement));
+  const fragment = document.createDocumentFragment();
+  array.forEach((arrayElement) => {
+    const card = fillPropertyOffer(arrayElement);
+    checkNode(card);
+    fragment.appendChild(card);
+  });
+  mapContainer.appendChild(fragment);
 };
 
-export {renderPropertyOffer, renderPropertyOffers, fillPropertyOffer};
+export {renderPropertyOffers, fillPropertyOffer};
