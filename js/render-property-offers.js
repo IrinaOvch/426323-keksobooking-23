@@ -1,4 +1,6 @@
-const PROPERTY_TYPES = {
+import {declOfNum} from './utils.js';
+
+const propertyTypes = {
   flat: 'Квартира',
   bungalow: 'Бунгало',
   house: 'Дом',
@@ -6,68 +8,88 @@ const PROPERTY_TYPES = {
   hotel: 'Отель',
 };
 
-const container = document.querySelector('#map-canvas');
+const ROOM_WORD_VARIATIONS = ['комната', 'комнаты', 'комнат'];
+const GUEST_WORD_VARIATIONS = ['гостя', 'гостей', 'гостей'];
+
+const mapContainer = document.querySelector('#map-canvas');
 const cardTemplate = document.querySelector('#card').content.querySelector('.popup');
+const newCard = cardTemplate.cloneNode(true);
 
-const renderPropertyOffer = ({author, offer}) => {
-  const newCard = cardTemplate.cloneNode(true);
+const fillPhotos = (container, photos) => {
+  const photoElementEmpty = container.querySelector('.popup__photo');
+  photoElementEmpty.remove();
+  photos.forEach((photo) => {
+    const photoElement = photoElementEmpty.cloneNode();
+    photoElement.src = photo;
+    container.appendChild(photoElement);
+  });
+};
 
-  const setValue = (value, selector, str) => {
-    if (value) {
-      newCard.querySelector(selector).textContent = str ? str : value;
-    } else {
-      newCard.querySelector(selector).setAttribute('hidden');
+const fillFeatures = (container, features) => {
+  container.querySelectorAll('.popup__feature').forEach((child) => child.remove());
+  const emptyFeatureElement = document.createElement('li');
+  emptyFeatureElement.classList.add('popup__feature');
+  features.forEach((feature) => {
+    const featureElement = emptyFeatureElement.cloneNode();
+    featureElement.classList.add(`popup__feature--${feature}`);
+    container.appendChild(featureElement);
+  });
+};
+
+const checkNode = (card) => {
+  const nodes = card.children;
+  Array.from(nodes).forEach((node) => {
+    if (node.textContent.includes(undefined)) {
+      node.remove();
     }
-  };
 
-  const setTwoValues = (firstValue, secondValue, selector, str) => {
-    if (firstValue && secondValue) {
-      newCard.querySelector(selector).textContent = str;
-    } else {
-      newCard.querySelector(selector).setAttribute('hidden');
+    if (node.nodeName === ('IMG') && node.src.length === 0) {
+      node.remove();
     }
-  };
+  });
+};
 
-  setValue(offer.title, '.popup__title');
-  setValue(offer.address, '.popup__text--address');
-  setValue(PROPERTY_TYPES[offer.type], '.popup__type');
-  setValue(offer.description, '.popup__description');
-  setValue(offer.price, '.popup__text--price', `${offer.price} ₽/ночь`);
-  setTwoValues(offer.rooms, offer.guests, '.popup__text--capacity', `${offer.rooms} комнаты для ${offer.guests} гостей`);
-  setTwoValues(offer.checkin, offer.checkout, '.popup__text--time', `Заезд после ${offer.checkin}, выезд до ${offer.checkout}`);
+const fillPropertyOffer = ({author, offer}) => {
+  const {
+    title,
+    address,
+    type,
+    description,
+    price,
+    rooms,
+    guests,
+    checkin,
+    checkout,
+    features,
+    photos,
+  } = offer;
 
-  if (!author.avatar) {
-    newCard.querySelector('.popup__avatar').setAttribute('hidden');
-  }
+  newCard.querySelector('.popup__title').textContent = title;
+  newCard.querySelector('.popup__text--address').textContent = address;
+  newCard.querySelector('.popup__type').textContent = propertyTypes[type];
+  newCard.querySelector('.popup__description').textContent = description;
+  newCard.querySelector('.popup__text--price').textContent = `${price} ₽/ночь`;
+  newCard.querySelector('.popup__text--capacity').textContent = `${declOfNum(rooms, ROOM_WORD_VARIATIONS)} для ${declOfNum(guests, GUEST_WORD_VARIATIONS)} `;
+  newCard.querySelector('.popup__text--time').textContent = `Заезд после ${checkin}, выезд до ${checkout}`;
   newCard.querySelector('.popup__avatar').src = author.avatar;
 
   const featuresList = newCard.querySelector('.popup__features');
-  const modifiers = offer.features.map((feature) => `popup__feature--${feature}`);
-
-  featuresList.querySelectorAll('.popup__feature').forEach((item) => {
-    const modifier = item.classList[1];
-    if(!modifiers.includes(modifier)) {
-      item.remove();
-    }
-  });
+  fillFeatures(featuresList, features);
 
   const photosContainer = newCard.querySelector('.popup__photos');
-  const photoElementEmpty = newCard.querySelector('.popup__photo');
-  photoElementEmpty.remove();
-  if (!offer.photos) {
-    photosContainer.setAttribute('hidden');
-  }
-  offer.photos.forEach((photo) => {
-    const photoElement = photoElementEmpty.cloneNode(false);
-    photoElement.src = photo;
-    photosContainer.appendChild(photoElement);
-  });
+  fillPhotos(photosContainer, photos);
 
-  container.appendChild(newCard);
+  return newCard;
+};
+
+const renderPropertyOffer = (object) => {
+  const card = fillPropertyOffer(object);
+  checkNode(card);
+  mapContainer.appendChild(card);
 };
 
 const renderPropertyOffers = (array) => {
   array.forEach((arrayElement) => renderPropertyOffer(arrayElement));
 };
 
-export {renderPropertyOffer, renderPropertyOffers};
+export {renderPropertyOffer, renderPropertyOffers, fillPropertyOffer};
