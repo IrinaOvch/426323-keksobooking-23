@@ -1,4 +1,4 @@
-import {declOfNum} from './utils.js';
+import {getDeclOfNum} from './utils.js';
 
 const propertyTypes = {
   flat: 'Квартира',
@@ -17,6 +17,7 @@ const cardTemplate = document.querySelector('#card').content.querySelector('.pop
 const fillPhotos = (container, photos) => {
   const photoElementEmpty = container.querySelector('.popup__photo');
   photoElementEmpty.remove();
+
   photos.forEach((photo) => {
     const photoElement = photoElementEmpty.cloneNode();
     photoElement.src = photo;
@@ -25,18 +26,18 @@ const fillPhotos = (container, photos) => {
 };
 
 const fillFeatures = (container, features) => {
-  container.querySelectorAll('.popup__feature').forEach((child) => child.remove());
-  const emptyFeatureElement = document.createElement('li');
-  emptyFeatureElement.classList.add('popup__feature');
+  container.innerHTML = '';
+
   features.forEach((feature) => {
-    const featureElement = emptyFeatureElement.cloneNode();
-    featureElement.classList.add(`popup__feature--${feature}`);
+    const featureElement = document.createElement('li');
+    featureElement.classList.add('popup__feature', `popup__feature--${feature}`);
     container.appendChild(featureElement);
   });
 };
 
-const checkNode = (card) => {
+const checkNodes = (card) => {
   const nodes = card.children;
+
   Array.from(nodes).forEach((node) => {
     if (node.textContent.includes(undefined)) {
       node.remove();
@@ -46,6 +47,8 @@ const checkNode = (card) => {
       node.remove();
     }
   });
+
+  return card;
 };
 
 const fillPropertyOffer = ({author, offer}) => {
@@ -69,7 +72,7 @@ const fillPropertyOffer = ({author, offer}) => {
   newCard.querySelector('.popup__type').textContent = propertyTypes[type];
   newCard.querySelector('.popup__description').textContent = description;
   newCard.querySelector('.popup__text--price').textContent = `${price} ₽/ночь`;
-  newCard.querySelector('.popup__text--capacity').textContent = `${declOfNum(rooms, ROOM_WORD_VARIATIONS)} для ${declOfNum(guests, GUEST_WORD_VARIATIONS)} `;
+  newCard.querySelector('.popup__text--capacity').textContent = `${getDeclOfNum(rooms, ROOM_WORD_VARIATIONS)} для ${getDeclOfNum(guests, GUEST_WORD_VARIATIONS)} `;
   newCard.querySelector('.popup__text--time').textContent = `Заезд после ${checkin}, выезд до ${checkout}`;
   newCard.querySelector('.popup__avatar').src = author.avatar;
 
@@ -79,14 +82,14 @@ const fillPropertyOffer = ({author, offer}) => {
   const photosContainer = newCard.querySelector('.popup__photos');
   fillPhotos(photosContainer, photos);
 
-  return newCard;
+  return checkNodes(newCard);
 };
 
 const renderPropertyOffers = (array) => {
   const fragment = document.createDocumentFragment();
+
   array.forEach((arrayElement) => {
     const card = fillPropertyOffer(arrayElement);
-    checkNode(card);
     fragment.appendChild(card);
   });
   mapContainer.appendChild(fragment);
