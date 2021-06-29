@@ -1,13 +1,23 @@
 const MIN_TITLE_LENGTH = 30;
 const MAX_TITLE_LENGTH = 100;
 const MAX_PRICE = 1000000;
+const MIN_PRICES = {
+  'palace': 10000,
+  'flat': 1000,
+  'house': 5000,
+  'bungalow': 0,
+  'hotel': 3000,
+};
 
 const adForm = document.querySelector('.ad-form');
 const mapForm = document.querySelector('.map__filters');
-const offerTitleInput = document.querySelector('#title');
-const offerPriceInput = document.querySelector('#price');
-const roomsAmountSelect = document.querySelector('#room_number');
-const guestsAmountSelect = document.querySelector('#capacity');
+const offerTitleInput = adForm.querySelector('#title');
+const offerPriceInput = adForm.querySelector('#price');
+const roomsAmountSelect = adForm.querySelector('#room_number');
+const guestsAmountSelect = adForm.querySelector('#capacity');
+const propertyTypeSelect = adForm.querySelector('#type');
+const checkinTimeSelect = adForm.querySelector('#timein');
+const checkoutTimeSelect = adForm.querySelector('#timeout');
 
 const guestsAmountOfRooms = {
   1: {
@@ -75,6 +85,8 @@ const titleChangeHandler = (evt) => {
 const priceChangeHandler = () => {
   if (offerPriceInput.value > MAX_PRICE) {
     offerPriceInput.setCustomValidity(`Максимальная цена превышена на ${offerPriceInput.value - MAX_PRICE}₽`);
+  } else if (offerPriceInput.value < MIN_PRICES[propertyTypeSelect.value]) {
+    offerPriceInput.setCustomValidity(`Минимальная цена для данного типа жилья: ${MIN_PRICES[propertyTypeSelect.value]}₽`);
   } else {
     offerPriceInput.setCustomValidity('');
   }
@@ -96,8 +108,19 @@ const guestsAmountChangeHandler = () => {
   guestsAmountSelect.reportValidity();
 };
 
+const housingTypeChangeHandler = (evt) => {
+  const housingTypeValue = evt.target.value;
+  offerPriceInput.placeholder = MIN_PRICES[housingTypeValue];
+};
+
+const chechinTimeChangeHandler = (evt) => {
+  checkoutTimeSelect.value = evt.target.value;
+  checkinTimeSelect.value = evt.target.value;
+};
+
 const formSubmitHandler = (evt) => {
   guestsAmountChangeHandler();
+  priceChangeHandler();
 
   if (!adForm.checkValidity()) {
     evt.preventDefault();
@@ -108,6 +131,9 @@ const setFormListeners = () => {
   offerTitleInput.addEventListener('change', titleChangeHandler);
   offerPriceInput.addEventListener('change', priceChangeHandler);
   guestsAmountSelect.addEventListener('change', guestsAmountChangeHandler);
+  propertyTypeSelect.addEventListener('change', housingTypeChangeHandler);
+  checkinTimeSelect.addEventListener('change', chechinTimeChangeHandler);
+  checkoutTimeSelect.addEventListener('change', chechinTimeChangeHandler);
   adForm.addEventListener('submit', formSubmitHandler);
 };
 
