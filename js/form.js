@@ -1,25 +1,32 @@
 const MIN_TITLE_LENGTH = 30;
 const MAX_TITLE_LENGTH = 100;
 const MAX_PRICE = 1000000;
-const MAX_GUESTS_AMOUNT = 100;
-const NO_GUESTS = 0;
 
 const adForm = document.querySelector('.ad-form');
 const mapForm = document.querySelector('.map__filters');
 const offerTitleInput = document.querySelector('#title');
 const offerPriceInput = document.querySelector('#price');
-const roomsAmountInput = document.querySelector('#room_number');
-const guestsAmountInput = document.querySelector('#capacity');
-const notForGuestsOption = guestsAmountInput.querySelector(`option[value="${NO_GUESTS}"]`);
-
+const roomsAmountSelect = document.querySelector('#room_number');
+const guestsAmountSelect = document.querySelector('#capacity');
 
 const guestsAmountOfRooms = {
-  1: [1],
-  2: [1, 2],
-  3: [1, 2, 3],
-  100: [0],
+  1: {
+    guests: [1],
+    getErrorText: (count) => `Максимум для ${count} гостя`,
+  },
+  2: {
+    guests: [1, 2],
+    getErrorText: (count) => `Максимум для ${count} гостей`,
+  },
+  3: {
+    guests: [1, 2, 3],
+    getErrorText: (count) => `Максимум для ${count} гостей`,
+  },
+  100: {
+    guests: [0],
+    getErrorText: () => 'Для 100 комнат можно выбрать только вариант "Не для гостей"',
+  },
 };
-
 
 const disableFormFieldsets = (form) => {
   form.querySelectorAll('fieldset').forEach((field) => {
@@ -45,9 +52,7 @@ const setActiveState = () => {
   enableFormFieldsets(adForm);
   mapForm.classList.remove('ad-form--disabled');
   enableFormFieldsets(mapForm);
-  notForGuestsOption.setAttribute('disabled', 'disabled');
 };
-
 
 const titleChangeHandler = (evt) => {
   const titleValueLength = evt.target.value.length;
@@ -77,27 +82,18 @@ const priceChangeHandler = () => {
   offerPriceInput.reportValidity('');
 };
 
-const roomsAmountChangeHandler = () => {
-  if (Number(roomsAmountInput.value) === MAX_GUESTS_AMOUNT) {
-    notForGuestsOption.removeAttribute('disabled', 'disabled');
-  } else {
-    notForGuestsOption.setAttribute('disabled', 'disabled');
-  }
-};
-
 const guestsAmountChangeHandler = () => {
-  const roomsValue = Number(roomsAmountInput.value);
-  const guestsValue = Number(guestsAmountInput.value);
+  const roomsValue = Number(roomsAmountSelect.value);
+  const guestsValue = Number(guestsAmountSelect.value);
 
-  if (!guestsAmountOfRooms[roomsValue].includes(guestsValue)) {
-    if (roomsValue === MAX_GUESTS_AMOUNT) {
-      guestsAmountInput.setCustomValidity(`Для ${MAX_GUESTS_AMOUNT} комнат можно выбрать только вариант "Не для гостей"`);
-    } else {
-      guestsAmountInput.setCustomValidity('Количество гостей не должно превышать количество комнат');
-    }
+  if (!guestsAmountOfRooms[roomsValue].guests.includes(guestsValue)) {
+    const guests = guestsAmountOfRooms[roomsValue].guests.join(', ');
+    guestsAmountSelect.setCustomValidity(guestsAmountOfRooms[roomsValue].getErrorText(guests));
   } else {
-    guestsAmountInput.setCustomValidity('');
+    guestsAmountSelect.setCustomValidity('');
   }
+
+  guestsAmountSelect.reportValidity();
 };
 
 const formSubmitHandler = (evt) => {
@@ -111,9 +107,7 @@ const formSubmitHandler = (evt) => {
 const setFormListeners = () => {
   offerTitleInput.addEventListener('change', titleChangeHandler);
   offerPriceInput.addEventListener('change', priceChangeHandler);
-  roomsAmountInput.addEventListener('change', roomsAmountChangeHandler);
-  roomsAmountInput.addEventListener('change', guestsAmountChangeHandler);
-  guestsAmountInput.addEventListener('change', guestsAmountChangeHandler);
+  guestsAmountSelect.addEventListener('change', guestsAmountChangeHandler);
   adForm.addEventListener('submit', formSubmitHandler);
 };
 
