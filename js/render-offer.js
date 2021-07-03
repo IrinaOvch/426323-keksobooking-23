@@ -11,7 +11,6 @@ const propertyTypes = {
 const ROOM_WORD_VARIATIONS = ['комната', 'комнаты', 'комнат'];
 const GUEST_WORD_VARIATIONS = ['гостя', 'гостей', 'гостей'];
 
-const mapContainer = document.querySelector('#map-canvas');
 const cardTemplate = document.querySelector('#card').content.querySelector('.popup');
 
 const fillPhotos = (container, photos) => {
@@ -85,14 +84,4 @@ const fillPropertyOffer = ({author, offer}) => {
   return checkNodes(newCard);
 };
 
-const renderPropertyOffers = (array) => {
-  const fragment = document.createDocumentFragment();
-
-  array.forEach((arrayElement) => {
-    const card = fillPropertyOffer(arrayElement);
-    fragment.appendChild(card);
-  });
-  mapContainer.appendChild(fragment);
-};
-
-export {renderPropertyOffers, fillPropertyOffer};
+export {fillPropertyOffer};

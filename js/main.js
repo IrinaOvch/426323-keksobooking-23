@@ -1,8 +1,6 @@
-import {createPropertyOffers} from './mock-data.js';
-import {renderPropertyOffers} from './render-property-offers.js';
-import {setInactiveState, setActiveState, setFormListeners} from './form.js';
+import {setInactiveState, setFormListeners} from './form.js';
+import { setMap } from './map.js';
 
-renderPropertyOffers(createPropertyOffers());
 setInactiveState();
-setActiveState();
+setMap();
 setFormListeners();
