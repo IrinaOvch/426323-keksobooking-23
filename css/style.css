@@ -87,6 +87,7 @@ fieldset {
   width: 100%;
   height: 500px;
   background-color: #dddddd;
+  z-index: 1;
 }
 
 
@@ -943,6 +944,20 @@ fieldset {
   vertical-align: middle;
 
   background-color: rgba(0, 0, 0, 0.8);
+}
+
+.download-error {
+  position: absolute;
+  z-index: 2;
+  background-color: rgba(0, 0, 0, 0.8);
+  width: 100%;
+}
+
+.download-error__message {
+  color: #ffffff;
+  font-size: 24px;
+  text-align: center;
+  margin: 15px 0;
 }
 
 .success__message,
