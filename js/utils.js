@@ -29,4 +29,23 @@ const getRandomArrayElements = (elements) => {
 
 const getDeclOfNum = (number, words) => `${number} ${words[(number % 100 > 4 && number % 100 < 20) ? 2 : [2, 0, 1, 1, 1, 2][(number % 10 < 5) ? number % 10 : 5]]}`;
 
-export {getRandomPositiveFloat, getRandomPositiveInteger, getRandomArrayElement, getRandomArrayElements, getDeclOfNum};
+const handleEscKeydown = (cb) => (evt) => {
+  if (evt.key === 'Escape' || evt.key === 'Esc') {
+    cb();
+    window.removeEventListener('keydown', cb);
+  }
+};
+
+const setSelectInitialValue = (select) => {
+  const selectInitialValue = select.querySelector('option[selected]').value;
+  select.value = selectInitialValue;
+};
+
+const resetCheckboxes = (name) => {
+  const checkboxes = document.querySelectorAll(`input[name="${name}"]`);
+  checkboxes.forEach((checkbox) => {
+    checkbox.checked = false;
+  });
+};
+
+export { getRandomPositiveFloat, getRandomPositiveInteger, getRandomArrayElement, getRandomArrayElements, getDeclOfNum, handleEscKeydown, setSelectInitialValue, resetCheckboxes };
