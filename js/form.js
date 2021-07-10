@@ -1,6 +1,5 @@
 import { sendData } from './api.js';
 import { mainPin, resetMap } from './map.js';
-import { handleEscKeydown, setSelectInitialValue, resetCheckboxes } from './utils.js';
 
 const MIN_TITLE_LENGTH = 30;
 const DIGITS = 5;
@@ -17,17 +16,15 @@ const MIN_PRICES = {
 const adForm = document.querySelector('.ad-form');
 const mapForm = document.querySelector('.map__filters');
 const offerTitleInput = adForm.querySelector('#title');
-const descriptionInput = adForm.querySelector('#description');
 const offerPriceInput = adForm.querySelector('#price');
 const roomsAmountSelect = adForm.querySelector('#room_number');
 const guestsAmountSelect = adForm.querySelector('#capacity');
 const propertyTypeSelect = adForm.querySelector('#type');
 const checkinTimeSelect = adForm.querySelector('#timein');
 const checkoutTimeSelect = adForm.querySelector('#timeout');
-const pageBody = document.querySelector('body');
 const successWindow = document.querySelector('#success').content.querySelector('.success').cloneNode(true);
 const formSubmitErrorWindow = document.querySelector('#error').content.querySelector('.error').cloneNode(true);
-const tryAgainbutton = formSubmitErrorWindow.querySelector('.error__button');
+const tryAgainButton = formSubmitErrorWindow.querySelector('.error__button');
 const addressInput = document.querySelector('#address');
 const formResetButton = document.querySelector('.ad-form__reset');
 
@@ -67,6 +64,10 @@ const setAdressCoords = () => {
   addressInput.value = `${lat.toFixed(DIGITS)}, ${lng.toFixed(DIGITS)}`;
 };
 
+const setPriceInputPlaceholder = () => {
+  offerPriceInput.placeholder = MIN_PRICES[propertyTypeSelect.value];
+};
+
 const setInactiveState = () => {
   adForm.classList.add('ad-form--disabled');
   disableFormFieldsets(adForm);
@@ -80,6 +81,7 @@ const setActiveState = () => {
   mapForm.classList.remove('ad-form--disabled');
   enableFormFieldsets(mapForm);
   setAdressCoords();
+  setPriceInputPlaceholder();
 };
 
 const titleChangeHandler = (evt) => {
@@ -127,17 +129,9 @@ const guestsAmountChangeHandler = () => {
 };
 
 const resetForm = () => {
-  offerTitleInput.value = '';
-  offerPriceInput.value = '';
-  descriptionInput.value = '';
-  setSelectInitialValue(roomsAmountSelect);
-  setSelectInitialValue(guestsAmountSelect);
-  setSelectInitialValue(propertyTypeSelect);
-  setSelectInitialValue(checkinTimeSelect);
-  setSelectInitialValue(checkoutTimeSelect);
+  adForm.reset();
   resetMap();
   setAdressCoords();
-  resetCheckboxes('feature');
 };
 
 const housingTypeChangeHandler = (evt) => {
@@ -150,26 +144,34 @@ const chechinTimeChangeHandler = (evt) => {
   checkinTimeSelect.value = evt.target.value;
 };
 
-const hideFormSubmitAlert = () => {
-  pageBody.removeChild(formSubmitErrorWindow);
+const hideFormSubmitAlert = (evt) => {
+  if (evt.key === 'Escape' || evt.key === 'Esc' || evt.target === tryAgainButton) {
+    document.body.removeChild(formSubmitErrorWindow);
+  }
+
+  window.removeEventListener('keydown', hideFormSubmitAlert);
 };
 
-const hideSuccessWindow = () => {
-  pageBody.removeChild(successWindow);
+const hideSuccessWindow = (evt) => {
+  if (evt.key === 'Escape' || evt.key === 'Esc' || evt.type === 'click') {
+    document.body.removeChild(successWindow);
+  }
+
   window.removeEventListener('click', hideSuccessWindow);
+  window.removeEventListener('keydown', hideSuccessWindow);
   resetForm();
 };
 
 const showSuccessWindow = () => {
-  pageBody.appendChild(successWindow);
-  window.addEventListener('keydown', handleEscKeydown(hideSuccessWindow));
+  document.body.appendChild(successWindow);
+  window.addEventListener('keydown', hideSuccessWindow);
   window.addEventListener('click', hideSuccessWindow);
 };
 
 const showFormSubmitAlert = () => {
-  pageBody.appendChild(formSubmitErrorWindow);
-  tryAgainbutton.addEventListener('click', hideFormSubmitAlert);
-  window.addEventListener('keydown', handleEscKeydown(hideFormSubmitAlert));
+  document.body.appendChild(formSubmitErrorWindow);
+  tryAgainButton.addEventListener('click', hideFormSubmitAlert);
+  window.addEventListener('keydown', hideFormSubmitAlert);
 };
 
 const formResetButtonClickHandler = (evt) => {
@@ -179,23 +181,18 @@ const formResetButtonClickHandler = (evt) => {
   // will be added soon
 };
 
-const setOfferFormSubmit = () => {
+const formSubmitHandler = (evt) => {
+  evt.preventDefault();
+  guestsAmountChangeHandler();
+  priceChangeHandler();
 
-  const formSubmitHandler = (evt) => {
-    evt.preventDefault();
-    guestsAmountChangeHandler();
-    priceChangeHandler();
-
-    if (adForm.checkValidity()) {
-      sendData(
-        showSuccessWindow,
-        showFormSubmitAlert,
-        new FormData(evt.target),
-      );
-    }
-  };
-
-  adForm.addEventListener('submit', formSubmitHandler);
+  if (adForm.checkValidity()) {
+    sendData(
+      showSuccessWindow,
+      showFormSubmitAlert,
+      new FormData(evt.target),
+    );
+  }
 };
 
 const setFormListeners = () => {
@@ -206,6 +203,7 @@ const setFormListeners = () => {
   checkinTimeSelect.addEventListener('change', chechinTimeChangeHandler);
   checkoutTimeSelect.addEventListener('change', chechinTimeChangeHandler);
   formResetButton.addEventListener('click', formResetButtonClickHandler);
+  adForm.addEventListener('submit', formSubmitHandler);
 };
 
-export { setInactiveState, setActiveState, setFormListeners, setOfferFormSubmit, setAdressCoords };
+export { setInactiveState, setActiveState, setFormListeners, setAdressCoords };

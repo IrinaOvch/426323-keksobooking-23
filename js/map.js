@@ -12,9 +12,10 @@ const TokyoCoords = {
 const ZOOM_LEVEL = 13;
 const PIN_SIZE = 40;
 const MAIN_PIN_SIZE = 52;
+const ERROR_MESSAGE = 'При загрузке данных с сервера произошла ошибка, пожалуйста, перезагрузите страницу';
 
-const dowloadErrorWindow = document.querySelector('#download-error').content.querySelector('.download-error').cloneNode(true);
 const mapSection = document.querySelector('.map');
+const mapCanvas = document.querySelector('.map__canvas');
 
 const mainPinIcon = L.icon({
   iconUrl: '../img/main-pin.svg',
@@ -38,7 +39,8 @@ const mainPin = L.marker(
   },
 );
 
-const renderPins = (array, layerGroup) => {
+const renderPins = (array) => {
+  const markerGroup = L.layerGroup().addTo(map);
   array.forEach((offer) => {
     const {lat, lng} = offer.location;
     const marker = L.marker({
@@ -50,7 +52,7 @@ const renderPins = (array, layerGroup) => {
     },
     );
     marker
-      .addTo(layerGroup)
+      .addTo(markerGroup)
       .bindPopup(
         fillPropertyOffer(offer),
         {
@@ -60,7 +62,7 @@ const renderPins = (array, layerGroup) => {
   });
 };
 
-const setMap = (offers) => {
+const setMap = () => {
   map
     .on('load', setActiveState)
     .setView([TokyoCoords.LAT, TokyoCoords.LNG] , ZOOM_LEVEL);
@@ -71,15 +73,27 @@ const setMap = (offers) => {
       attribution: TileLayer.ATTRIBUTION,
     },
   ).addTo(map);
-  const markerGroup = L.layerGroup().addTo(map);
   mainPin.addTo(map);
 
   mainPin.on('move', setAdressCoords);
-  renderPins(offers, markerGroup);
 };
 
 const showDowloadErrorWindow = () => {
-  mapSection.appendChild(dowloadErrorWindow);
+  const downloadErrorAlert = document.createElement('p');
+  downloadErrorAlert.style.position = 'absolute';
+  downloadErrorAlert.style.zIndex = 2;
+  downloadErrorAlert.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+  downloadErrorAlert.style.width = '100%';
+  downloadErrorAlert.style.color = 'white';
+  downloadErrorAlert.style.fontSize = '24px';
+  downloadErrorAlert.style.textAlign = 'center';
+  downloadErrorAlert.style.padding = '15px 0';
+  downloadErrorAlert.style.margin = '0';
+  mapCanvas.style.zIndex = 1;
+
+  downloadErrorAlert.textContent = ERROR_MESSAGE;
+
+  mapSection.appendChild(downloadErrorAlert);
 };
 
 const resetMap = () => {
@@ -87,4 +101,4 @@ const resetMap = () => {
   map.setView([TokyoCoords.LAT, TokyoCoords.LNG]);
 };
 
-export { setMap, mainPin, showDowloadErrorWindow, resetMap };
+export { setMap, mainPin, showDowloadErrorWindow, resetMap, renderPins };
