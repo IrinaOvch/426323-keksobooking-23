@@ -1,5 +1,7 @@
 import { setActiveState, setAdressCoords } from './form.js';
 import { fillPropertyOffer } from './render-offer.js';
+import { getData } from './api.js';
+import { showDowloadErrorWindow } from './messages.js';
 
 const TileLayer = {
   URL: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
@@ -12,10 +14,6 @@ const TokyoCoords = {
 const ZOOM_LEVEL = 13;
 const PIN_SIZE = 40;
 const MAIN_PIN_SIZE = 52;
-const ERROR_MESSAGE = 'При загрузке данных с сервера произошла ошибка, пожалуйста, перезагрузите страницу';
-
-const mapSection = document.querySelector('.map');
-const mapCanvas = document.querySelector('.map__canvas');
 
 const mainPinIcon = L.icon({
   iconUrl: '../img/main-pin.svg',
@@ -62,9 +60,14 @@ const renderPins = (array) => {
   });
 };
 
+const onMapLoad = () => {
+  setActiveState();
+  getData(renderPins, showDowloadErrorWindow);
+};
+
 const setMap = () => {
   map
-    .on('load', setActiveState)
+    .on('load', onMapLoad)
     .setView([TokyoCoords.LAT, TokyoCoords.LNG] , ZOOM_LEVEL);
 
   L.tileLayer(
@@ -78,27 +81,9 @@ const setMap = () => {
   mainPin.on('move', setAdressCoords);
 };
 
-const showDowloadErrorWindow = () => {
-  const downloadErrorAlert = document.createElement('p');
-  downloadErrorAlert.style.position = 'absolute';
-  downloadErrorAlert.style.zIndex = 2;
-  downloadErrorAlert.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
-  downloadErrorAlert.style.width = '100%';
-  downloadErrorAlert.style.color = 'white';
-  downloadErrorAlert.style.fontSize = '24px';
-  downloadErrorAlert.style.textAlign = 'center';
-  downloadErrorAlert.style.padding = '15px 0';
-  downloadErrorAlert.style.margin = '0';
-  mapCanvas.style.zIndex = 1;
-
-  downloadErrorAlert.textContent = ERROR_MESSAGE;
-
-  mapSection.appendChild(downloadErrorAlert);
-};
-
 const resetMap = () => {
   mainPin.setLatLng([TokyoCoords.LAT, TokyoCoords.LNG]);
   map.setView([TokyoCoords.LAT, TokyoCoords.LNG]);
 };
 
-export { setMap, mainPin, showDowloadErrorWindow, resetMap, renderPins };
+export { setMap, mainPin, resetMap, renderPins };

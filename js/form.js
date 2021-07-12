@@ -144,34 +144,49 @@ const chechinTimeChangeHandler = (evt) => {
   checkinTimeSelect.value = evt.target.value;
 };
 
-const hideFormSubmitAlert = (evt) => {
-  if (evt.key === 'Escape' || evt.key === 'Esc' || evt.target === tryAgainButton) {
-    document.body.removeChild(formSubmitErrorWindow);
-  }
 
-  window.removeEventListener('keydown', hideFormSubmitAlert);
+// ошибка отправки формы
+
+const hideFormSubmitAlert = () => {
+  document.body.removeChild(formSubmitErrorWindow);
+  window.removeEventListener('keydown', formSubmitErrorWindowKeydownHandler);
 };
 
-const hideSuccessWindow = (evt) => {
-  if (evt.key === 'Escape' || evt.key === 'Esc' || evt.type === 'click') {
-    document.body.removeChild(successWindow);
+const tryAgainButtonClickHandler = () => hideFormSubmitAlert();
+const formSubmitErrorWindowKeydownHandler = (evt) => {
+  if (evt.key === 'Escape' || evt.key === 'Esc') {
+    hideFormSubmitAlert();
   }
-
-  window.removeEventListener('click', hideSuccessWindow);
-  window.removeEventListener('keydown', hideSuccessWindow);
-  resetForm();
-};
-
-const showSuccessWindow = () => {
-  document.body.appendChild(successWindow);
-  window.addEventListener('keydown', hideSuccessWindow);
-  window.addEventListener('click', hideSuccessWindow);
 };
 
 const showFormSubmitAlert = () => {
   document.body.appendChild(formSubmitErrorWindow);
-  tryAgainButton.addEventListener('click', hideFormSubmitAlert);
-  window.addEventListener('keydown', hideFormSubmitAlert);
+  tryAgainButton.addEventListener('click', tryAgainButtonClickHandler);
+  window.addEventListener('keydown', formSubmitErrorWindowKeydownHandler);
+};
+
+// успешная отправка
+
+const hideSuccessWindow = () => {
+  document.body.removeChild(successWindow);
+  resetForm();
+  window.removeEventListener('keydown', successWindowKeydownHandler);
+};
+
+const successWindowClickHandler = () => {
+  hideSuccessWindow();
+};
+
+const successWindowKeydownHandler = (evt) => {
+  if (evt.key === 'Escape' || evt.key === 'Esc') {
+    hideSuccessWindow();
+  }
+};
+
+const showSuccessWindow = () => {
+  document.body.appendChild(successWindow);
+  window.addEventListener('keydown', successWindowKeydownHandler);
+  successWindow.addEventListener('click', successWindowClickHandler);
 };
 
 const formResetButtonClickHandler = (evt) => {
