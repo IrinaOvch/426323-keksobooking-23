@@ -1,4 +1,4 @@
-import {getDeclOfNum} from './utils.js';
+import { getDeclOfNum } from './utils.js';
 
 const propertyTypes = {
   flat: 'Квартира',
@@ -13,7 +13,10 @@ const GUEST_WORD_VARIATIONS = ['гостя', 'гостей', 'гостей'];
 
 const cardTemplate = document.querySelector('#card').content.querySelector('.popup');
 
-const fillPhotos = (container, photos) => {
+const fillPhotos = (container, photos = []) => {
+  if (photos.length === 0 ) {
+    return;
+  }
   const photoElementEmpty = container.querySelector('.popup__photo');
   photoElementEmpty.remove();
 
@@ -24,8 +27,11 @@ const fillPhotos = (container, photos) => {
   });
 };
 
-const fillFeatures = (container, features) => {
+const fillFeatures = (container, features = []) => {
   container.innerHTML = '';
+  if (features.length === 0 ) {
+    return;
+  }
 
   features.forEach((feature) => {
     const featureElement = document.createElement('li');
@@ -84,4 +90,4 @@ const fillPropertyOffer = ({author, offer}) => {
   return checkNodes(newCard);
 };
 
-export {fillPropertyOffer};
+export { fillPropertyOffer };

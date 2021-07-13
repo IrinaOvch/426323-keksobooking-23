@@ -1,4 +1,8 @@
+import { sendData } from './api.js';
+import { mainPin, resetMap } from './map.js';
+
 const MIN_TITLE_LENGTH = 30;
+const DIGITS = 5;
 const MAX_TITLE_LENGTH = 100;
 const MAX_PRICE = 1000000;
 const MIN_PRICES = {
@@ -18,6 +22,11 @@ const guestsAmountSelect = adForm.querySelector('#capacity');
 const propertyTypeSelect = adForm.querySelector('#type');
 const checkinTimeSelect = adForm.querySelector('#timein');
 const checkoutTimeSelect = adForm.querySelector('#timeout');
+const successWindow = document.querySelector('#success').content.querySelector('.success').cloneNode(true);
+const formSubmitErrorWindow = document.querySelector('#error').content.querySelector('.error').cloneNode(true);
+const tryAgainButton = formSubmitErrorWindow.querySelector('.error__button');
+const addressInput = document.querySelector('#address');
+const formResetButton = document.querySelector('.ad-form__reset');
 
 const guestsAmountOfRooms = {
   1: {
@@ -50,6 +59,15 @@ const enableFormFieldsets = (form) => {
   });
 };
 
+const setAdressCoords = () => {
+  const {lat, lng} = mainPin.getLatLng();
+  addressInput.value = `${lat.toFixed(DIGITS)}, ${lng.toFixed(DIGITS)}`;
+};
+
+const setPriceInputPlaceholder = () => {
+  offerPriceInput.placeholder = MIN_PRICES[propertyTypeSelect.value];
+};
+
 const setInactiveState = () => {
   adForm.classList.add('ad-form--disabled');
   disableFormFieldsets(adForm);
@@ -62,6 +80,8 @@ const setActiveState = () => {
   enableFormFieldsets(adForm);
   mapForm.classList.remove('ad-form--disabled');
   enableFormFieldsets(mapForm);
+  setAdressCoords();
+  setPriceInputPlaceholder();
 };
 
 const titleChangeHandler = (evt) => {
@@ -108,6 +128,12 @@ const guestsAmountChangeHandler = () => {
   guestsAmountSelect.reportValidity();
 };
 
+const resetForm = () => {
+  adForm.reset();
+  resetMap();
+  setAdressCoords();
+};
+
 const housingTypeChangeHandler = (evt) => {
   const housingTypeValue = evt.target.value;
   offerPriceInput.placeholder = MIN_PRICES[housingTypeValue];
@@ -118,12 +144,69 @@ const chechinTimeChangeHandler = (evt) => {
   checkinTimeSelect.value = evt.target.value;
 };
 
+
+// ошибка отправки формы
+
+const hideFormSubmitAlert = () => {
+  document.body.removeChild(formSubmitErrorWindow);
+  window.removeEventListener('keydown', formSubmitErrorWindowKeydownHandler);
+};
+
+const tryAgainButtonClickHandler = () => hideFormSubmitAlert();
+const formSubmitErrorWindowKeydownHandler = (evt) => {
+  if (evt.key === 'Escape' || evt.key === 'Esc') {
+    hideFormSubmitAlert();
+  }
+};
+
+const showFormSubmitAlert = () => {
+  document.body.appendChild(formSubmitErrorWindow);
+  tryAgainButton.addEventListener('click', tryAgainButtonClickHandler);
+  window.addEventListener('keydown', formSubmitErrorWindowKeydownHandler);
+};
+
+// успешная отправка
+
+const hideSuccessWindow = () => {
+  document.body.removeChild(successWindow);
+  resetForm();
+  window.removeEventListener('keydown', successWindowKeydownHandler);
+};
+
+const successWindowClickHandler = () => {
+  hideSuccessWindow();
+};
+
+const successWindowKeydownHandler = (evt) => {
+  if (evt.key === 'Escape' || evt.key === 'Esc') {
+    hideSuccessWindow();
+  }
+};
+
+const showSuccessWindow = () => {
+  document.body.appendChild(successWindow);
+  window.addEventListener('keydown', successWindowKeydownHandler);
+  successWindow.addEventListener('click', successWindowClickHandler);
+};
+
+const formResetButtonClickHandler = (evt) => {
+  evt.preventDefault();
+  resetForm();
+  // resetFilter();
+  // will be added soon
+};
+
 const formSubmitHandler = (evt) => {
+  evt.preventDefault();
   guestsAmountChangeHandler();
   priceChangeHandler();
 
-  if (!adForm.checkValidity()) {
-    evt.preventDefault();
+  if (adForm.checkValidity()) {
+    sendData(
+      showSuccessWindow,
+      showFormSubmitAlert,
+      new FormData(evt.target),
+    );
   }
 };
 
@@ -134,7 +217,8 @@ const setFormListeners = () => {
   propertyTypeSelect.addEventListener('change', housingTypeChangeHandler);
   checkinTimeSelect.addEventListener('change', chechinTimeChangeHandler);
   checkoutTimeSelect.addEventListener('change', chechinTimeChangeHandler);
+  formResetButton.addEventListener('click', formResetButtonClickHandler);
   adForm.addEventListener('submit', formSubmitHandler);
 };
 
-export {setInactiveState, setActiveState, setFormListeners};
+export { setInactiveState, setActiveState, setFormListeners, setAdressCoords };
