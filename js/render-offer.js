@@ -14,11 +14,12 @@ const GUEST_WORD_VARIATIONS = ['гостя', 'гостей', 'гостей'];
 const cardTemplate = document.querySelector('#card').content.querySelector('.popup');
 
 const fillPhotos = (container, photos = []) => {
+  const photoElementEmpty = container.querySelector('.popup__photo');
+  photoElementEmpty.remove();
+
   if (photos.length === 0 ) {
     return;
   }
-  const photoElementEmpty = container.querySelector('.popup__photo');
-  photoElementEmpty.remove();
 
   photos.forEach((photo) => {
     const photoElement = photoElementEmpty.cloneNode();

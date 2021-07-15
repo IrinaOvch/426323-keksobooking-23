@@ -1,5 +1,6 @@
 import { sendData } from './api.js';
 import { mainPin, resetMap } from './map.js';
+import { mapFilter } from './filter.js';
 
 const MIN_TITLE_LENGTH = 30;
 const DIGITS = 5;
@@ -14,7 +15,6 @@ const MIN_PRICES = {
 };
 
 const adForm = document.querySelector('.ad-form');
-const mapForm = document.querySelector('.map__filters');
 const offerTitleInput = adForm.querySelector('#title');
 const offerPriceInput = adForm.querySelector('#price');
 const roomsAmountSelect = adForm.querySelector('#room_number');
@@ -71,15 +71,15 @@ const setPriceInputPlaceholder = () => {
 const setInactiveState = () => {
   adForm.classList.add('ad-form--disabled');
   disableFormFieldsets(adForm);
-  mapForm.classList.add('ad-form--disabled');
-  disableFormFieldsets(mapForm);
+  mapFilter.classList.add('ad-form--disabled');
+  disableFormFieldsets(mapFilter);
 };
 
 const setActiveState = () => {
   adForm.classList.remove('ad-form--disabled');
   enableFormFieldsets(adForm);
-  mapForm.classList.remove('ad-form--disabled');
-  enableFormFieldsets(mapForm);
+  mapFilter.classList.remove('ad-form--disabled');
+  enableFormFieldsets(mapFilter);
   setAdressCoords();
   setPriceInputPlaceholder();
 };
@@ -191,9 +191,8 @@ const showSuccessWindow = () => {
 
 const formResetButtonClickHandler = (evt) => {
   evt.preventDefault();
+  mapFilter.reset();
   resetForm();
-  // resetFilter();
-  // will be added soon
 };
 
 const formSubmitHandler = (evt) => {

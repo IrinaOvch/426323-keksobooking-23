@@ -1,7 +1,9 @@
 import { setActiveState, setAdressCoords } from './form.js';
+import { setMapFilterClick, filterOffers } from './filter.js';
 import { fillPropertyOffer } from './render-offer.js';
 import { getData } from './api.js';
 import { showDowloadErrorWindow } from './messages.js';
+import { debounce } from './utils.js';
 
 const TileLayer = {
   URL: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
@@ -14,6 +16,8 @@ const TokyoCoords = {
 const ZOOM_LEVEL = 13;
 const PIN_SIZE = 40;
 const MAIN_PIN_SIZE = 52;
+const RERENDER_DELAY = 500;
+const RENDERED_OFFERS_AMOUNT = 10;
 
 const mainPinIcon = L.icon({
   iconUrl: '../img/main-pin.svg',
@@ -36,33 +40,44 @@ const mainPin = L.marker(
     icon: mainPinIcon,
   },
 );
+const markerGroup = L.layerGroup().addTo(map);
 
 const renderPins = (array) => {
-  const markerGroup = L.layerGroup().addTo(map);
-  array.forEach((offer) => {
-    const {lat, lng} = offer.location;
-    const marker = L.marker({
-      lat,
-      lng,
-    },
-    {
-      icon: pinIcon,
-    },
-    );
-    marker
-      .addTo(markerGroup)
-      .bindPopup(
-        fillPropertyOffer(offer),
-        {
-          keepInView: true,
-        },
+  markerGroup.clearLayers();
+
+  array
+    .slice()
+    .filter(filterOffers)
+    .slice(0, RENDERED_OFFERS_AMOUNT)
+    .forEach((offer) => {
+      const {lat, lng} = offer.location;
+      const marker = L.marker({
+        lat,
+        lng,
+      },
+      {
+        icon: pinIcon,
+      },
       );
-  });
+      marker
+        .addTo(markerGroup)
+        .bindPopup(
+          fillPropertyOffer(offer),
+          {
+            keepInView: true,
+          },
+        );
+    });
 };
 
 const onMapLoad = () => {
   setActiveState();
-  getData(renderPins, showDowloadErrorWindow);
+  getData((offers) => {
+    renderPins(offers);
+    setMapFilterClick(debounce(
+      () => renderPins(offers), RERENDER_DELAY,
+    ));
+  }, showDowloadErrorWindow);
 };
 
 const setMap = () => {
