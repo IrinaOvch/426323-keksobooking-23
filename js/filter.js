@@ -1,4 +1,9 @@
+import { updatePins } from './map.js';
+import { debounce } from './utils.js';
+
 const MAX_PRICE = 1000000;
+const RENDERED_OFFERS_AMOUNT = 10;
+const FILTER_VALUE_ANY = 'any';
 const priceRanges = {
   low: {
     MIN: 0,
@@ -15,76 +20,67 @@ const priceRanges = {
 };
 
 const mapFilter = document.querySelector('.map__filters');
-
-const isPriceInRange = (price, range) => {
-  if (range === 'any') {
-    return true;
-  }
-
-  if (price > priceRanges[range].MIN && price < priceRanges[range].MAX) {
-    return true;
-  }
-
-  return false;
-};
-
 const housingTypeFilter = mapFilter.querySelector('#housing-type');
 const priceFilter = mapFilter.querySelector('#housing-price');
 const roomsAmountFilter = mapFilter.querySelector('#housing-rooms');
 const guestsAmountFilter = mapFilter.querySelector('#housing-guests');
 const featuresFilter = mapFilter.querySelector('#housing-features');
 
-const getFeatures = () => {
-  const checkedFeatures = [];
-  featuresFilter.querySelectorAll('input[type="checkbox"]:checked').forEach((feature) => {
-    if (feature.checked === true) {
-      checkedFeatures.push(feature.value);
-    }
-  });
-  return checkedFeatures;
+const isPriceInRange = (price, range) => {
+  if (range === FILTER_VALUE_ANY) {
+    return true;
+  }
+
+  return price > priceRanges[range].MIN && price < priceRanges[range].MAX;
 };
 
-const isValueFitsFilter = ( property, filter) => {
+const isValueMatchesFilter = ( property, filter) => {
   let filterValue = filter.value;
-  if (filterValue !== 'any' && filter !== housingTypeFilter) {
+  if (filterValue !== FILTER_VALUE_ANY && filter !== housingTypeFilter) {
     filterValue = Number(filter.value);
   }
-  if (filterValue === 'any' || property === filterValue) {
-    return true;
-  }
-  return false;
+
+  return filterValue === FILTER_VALUE_ANY || property === filterValue;
 };
 
-const isFeaturesFitFilter = (features = []) => {
-  const filteredFeatures = getFeatures();
+const areFeaturesMatchFilter = (features = []) => {
+  let result = true;
+  const filteredFeatures = featuresFilter.querySelectorAll('input[type="checkbox"]:checked');
+  filteredFeatures.forEach((feature) => {
+    if (!features.includes(feature.value)) {
+      result = false;
+    }
+  });
+  return result;
+};
 
-  for ( let i = 0; i < filteredFeatures.length; i++) {
-    if (!features.includes(filteredFeatures[i])) {
-      return false;
+const isOfferMatchesFilter = (offer) => {
+  const {type, price, rooms, guests, features} = offer;
+  return isValueMatchesFilter(type, housingTypeFilter)&&
+  isPriceInRange(price, priceFilter.value)&&
+  isValueMatchesFilter(rooms, roomsAmountFilter)&&
+  isValueMatchesFilter(guests, guestsAmountFilter)&&
+  areFeaturesMatchFilter(features);
+};
+
+const filterOffers = (offers) => {
+  const filteredOffers = [];
+  let counter = 0;
+  for (let i = 0; i < offers.length; i++) {
+    const {offer} = offers[i];
+    if (isOfferMatchesFilter(offer)) {
+      filteredOffers.push(offers[i]);
+      counter++;
+      if (counter === RENDERED_OFFERS_AMOUNT) {
+        break;
+      }
     }
   }
-
-  return true;
+  return filteredOffers;
 };
 
-const filterOffers = ({offer}) => {
-  const {type, price, rooms, guests, features} = offer;
-  if (
-    isValueFitsFilter(type, housingTypeFilter) &&
-    isPriceInRange(price, priceFilter.value)&&
-    isValueFitsFilter(rooms, roomsAmountFilter)&&
-    isValueFitsFilter(guests, guestsAmountFilter)&&
-    isFeaturesFitFilter(features)
-  ) {
-    return true;
-  }
-
-  return false;
+const setMapFilterClick = (data) => {
+  mapFilter.addEventListener('change', debounce(() => updatePins(data)));
 };
-
-const setMapFilterClick = (cb) => {
-  mapFilter.addEventListener('change', cb);
-};
-
 
 export { mapFilter, setMapFilterClick, filterOffers };

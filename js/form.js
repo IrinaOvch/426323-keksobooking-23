@@ -147,17 +147,18 @@ const chechinTimeChangeHandler = (evt) => {
 
 // ошибка отправки формы
 
-const hideFormSubmitAlert = () => {
-  document.body.removeChild(formSubmitErrorWindow);
-  window.removeEventListener('keydown', formSubmitErrorWindowKeydownHandler);
-};
-
-const tryAgainButtonClickHandler = () => hideFormSubmitAlert();
 const formSubmitErrorWindowKeydownHandler = (evt) => {
   if (evt.key === 'Escape' || evt.key === 'Esc') {
     hideFormSubmitAlert();
   }
 };
+
+function hideFormSubmitAlert() {
+  document.body.removeChild(formSubmitErrorWindow);
+  window.removeEventListener('keydown', formSubmitErrorWindowKeydownHandler);
+}
+
+const tryAgainButtonClickHandler = () => hideFormSubmitAlert();
 
 const showFormSubmitAlert = () => {
   document.body.appendChild(formSubmitErrorWindow);
@@ -167,27 +168,27 @@ const showFormSubmitAlert = () => {
 
 // успешная отправка
 
-const hideSuccessWindow = () => {
-  document.body.removeChild(successWindow);
-  resetForm();
-  window.removeEventListener('keydown', successWindowKeydownHandler);
-};
-
-const successWindowClickHandler = () => {
-  hideSuccessWindow();
-};
-
 const successWindowKeydownHandler = (evt) => {
   if (evt.key === 'Escape' || evt.key === 'Esc') {
     hideSuccessWindow();
   }
 };
 
-const showSuccessWindow = () => {
+function hideSuccessWindow() {
+  document.body.removeChild(successWindow);
+  resetForm();
+  window.removeEventListener('keydown', successWindowKeydownHandler);
+}
+
+const successWindowClickHandler = () => {
+  hideSuccessWindow();
+};
+
+function showSuccessWindow() {
   document.body.appendChild(successWindow);
   window.addEventListener('keydown', successWindowKeydownHandler);
   successWindow.addEventListener('click', successWindowClickHandler);
-};
+}
 
 const formResetButtonClickHandler = (evt) => {
   evt.preventDefault();
