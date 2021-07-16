@@ -1,7 +1,9 @@
 import { setActiveState, setAdressCoords } from './form.js';
+import { setMapFilterClick, filterOffers } from './filter.js';
 import { fillPropertyOffer } from './render-offer.js';
 import { getData } from './api.js';
 import { showDowloadErrorWindow } from './messages.js';
+import { saveToStore, getFromStore } from './store.js';
 
 const TileLayer = {
   URL: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
@@ -14,6 +16,7 @@ const TokyoCoords = {
 const ZOOM_LEVEL = 13;
 const PIN_SIZE = 40;
 const MAIN_PIN_SIZE = 52;
+const RENDERED_OFFERS_AMOUNT = 10;
 
 const mainPinIcon = L.icon({
   iconUrl: '../img/main-pin.svg',
@@ -36,9 +39,10 @@ const mainPin = L.marker(
     icon: mainPinIcon,
   },
 );
+const markerGroup = L.layerGroup().addTo(map);
 
 const renderPins = (array) => {
-  const markerGroup = L.layerGroup().addTo(map);
+  markerGroup.clearLayers();
   array.forEach((offer) => {
     const {lat, lng} = offer.location;
     const marker = L.marker({
@@ -62,7 +66,11 @@ const renderPins = (array) => {
 
 const onMapLoad = () => {
   setActiveState();
-  getData(renderPins, showDowloadErrorWindow);
+  getData((offers) => {
+    saveToStore(offers);
+    renderPins(offers.slice(0, RENDERED_OFFERS_AMOUNT));
+    setMapFilterClick(offers);
+  }, showDowloadErrorWindow);
 };
 
 const setMap = () => {
@@ -81,9 +89,15 @@ const setMap = () => {
   mainPin.on('move', setAdressCoords);
 };
 
+const updatePins = (offers) => {
+  const filteredOffers = filterOffers(offers);
+  renderPins(filteredOffers);
+};
+
 const resetMap = () => {
   mainPin.setLatLng([TokyoCoords.LAT, TokyoCoords.LNG]);
   map.setView([TokyoCoords.LAT, TokyoCoords.LNG]);
+  updatePins(getFromStore());
 };
 
-export { setMap, mainPin, resetMap, renderPins };
+export { setMap, mainPin, resetMap, renderPins, updatePins };
