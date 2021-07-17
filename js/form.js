@@ -1,6 +1,7 @@
 import { sendData } from './api.js';
 import { mainPin, resetMap } from './map.js';
 import { mapFilter } from './filter.js';
+import { setAvatarInputsListeners, clearPreviews } from './avatar.js';
 
 const MIN_TITLE_LENGTH = 30;
 const DIGITS = 5;
@@ -27,6 +28,9 @@ const formSubmitErrorWindow = document.querySelector('#error').content.querySele
 const tryAgainButton = formSubmitErrorWindow.querySelector('.error__button');
 const addressInput = document.querySelector('#address');
 const formResetButton = document.querySelector('.ad-form__reset');
+
+let hideFormSubmitAlert = null;
+let hideSuccessWindow = null;
 
 const guestsAmountOfRooms = {
   1: {
@@ -132,6 +136,7 @@ const resetForm = () => {
   adForm.reset();
   resetMap();
   setAdressCoords();
+  clearPreviews();
 };
 
 const housingTypeChangeHandler = (evt) => {
@@ -144,7 +149,6 @@ const chechinTimeChangeHandler = (evt) => {
   checkinTimeSelect.value = evt.target.value;
 };
 
-
 // ошибка отправки формы
 
 const formSubmitErrorWindowKeydownHandler = (evt) => {
@@ -153,10 +157,10 @@ const formSubmitErrorWindowKeydownHandler = (evt) => {
   }
 };
 
-function hideFormSubmitAlert() {
+hideFormSubmitAlert = () => {
   document.body.removeChild(formSubmitErrorWindow);
   window.removeEventListener('keydown', formSubmitErrorWindowKeydownHandler);
-}
+};
 
 const tryAgainButtonClickHandler = () => hideFormSubmitAlert();
 
@@ -174,11 +178,11 @@ const successWindowKeydownHandler = (evt) => {
   }
 };
 
-function hideSuccessWindow() {
+hideSuccessWindow = () => {
   document.body.removeChild(successWindow);
   resetForm();
   window.removeEventListener('keydown', successWindowKeydownHandler);
-}
+};
 
 const successWindowClickHandler = () => {
   hideSuccessWindow();
@@ -218,6 +222,7 @@ const setFormListeners = () => {
   checkinTimeSelect.addEventListener('change', chechinTimeChangeHandler);
   checkoutTimeSelect.addEventListener('change', chechinTimeChangeHandler);
   formResetButton.addEventListener('click', formResetButtonClickHandler);
+  setAvatarInputsListeners();
   adForm.addEventListener('submit', formSubmitHandler);
 };
 
