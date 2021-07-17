@@ -19,13 +19,13 @@ const MAIN_PIN_SIZE = 52;
 const RENDERED_OFFERS_AMOUNT = 10;
 
 const mainPinIcon = L.icon({
-  iconUrl: '../img/main-pin.svg',
+  iconUrl: 'img/main-pin.svg',
   iconSize: [MAIN_PIN_SIZE, MAIN_PIN_SIZE],
   iconAnchor: [MAIN_PIN_SIZE / 2, MAIN_PIN_SIZE],
 });
 
 const pinIcon = L.icon({
-  iconUrl: '../img/pin.svg',
+  iconUrl: 'img/pin.svg',
   iconSize: [PIN_SIZE, PIN_SIZE],
   iconAnchor: [PIN_SIZE / 2, PIN_SIZE],
 });
