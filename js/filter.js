@@ -44,14 +44,8 @@ const isValueMatchesFilter = ( property, filter) => {
 };
 
 const areFeaturesMatchFilter = (features = []) => {
-  let result = true;
   const filteredFeatures = featuresFilter.querySelectorAll('input[type="checkbox"]:checked');
-  filteredFeatures.forEach((feature) => {
-    if (!features.includes(feature.value)) {
-      result = false;
-    }
-  });
-  return result;
+  return [...filteredFeatures].every((feature) => features.includes(feature.value));
 };
 
 const isOfferMatchesFilter = (offer) => {
@@ -65,15 +59,10 @@ const isOfferMatchesFilter = (offer) => {
 
 const filterOffers = (offers) => {
   const filteredOffers = [];
-  let counter = 0;
-  for (let i = 0; i < offers.length; i++) {
+  for (let i = 0; i < offers.length || filteredOffers.length === RENDERED_OFFERS_AMOUNT; i++) {
     const {offer} = offers[i];
     if (isOfferMatchesFilter(offer)) {
       filteredOffers.push(offers[i]);
-      counter++;
-      if (counter === RENDERED_OFFERS_AMOUNT) {
-        break;
-      }
     }
   }
   return filteredOffers;
