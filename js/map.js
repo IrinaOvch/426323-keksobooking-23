@@ -1,5 +1,5 @@
 import { setActiveState, setAdressCoords } from './form.js';
-import { setMapFilterClick, filterOffers } from './filter.js';
+import { setMapFilterClick, filterOffers, enableFilterForm } from './filter.js';
 import { fillPropertyOffer } from './render-offer.js';
 import { getData } from './api.js';
 import { showDowloadErrorWindow } from './messages.js';
@@ -70,6 +70,7 @@ const onMapLoad = () => {
     saveToStore(offers);
     renderPins(offers.slice(0, RENDERED_OFFERS_AMOUNT));
     setMapFilterClick(offers);
+    enableFilterForm();
   }, showDowloadErrorWindow);
 };
 

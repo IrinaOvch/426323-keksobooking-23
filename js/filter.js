@@ -1,5 +1,6 @@
 import { updatePins } from './map.js';
 import { debounce } from './utils.js';
+import { enableFormFieldsets } from './form.js';
 
 const MAX_PRICE = 1000000;
 const RENDERED_OFFERS_AMOUNT = 10;
@@ -25,6 +26,11 @@ const priceFilter = mapFilter.querySelector('#housing-price');
 const roomsAmountFilter = mapFilter.querySelector('#housing-rooms');
 const guestsAmountFilter = mapFilter.querySelector('#housing-guests');
 const featuresFilter = mapFilter.querySelector('#housing-features');
+
+const enableFilterForm = () => {
+  mapFilter.classList.remove('ad-form--disabled');
+  enableFormFieldsets(mapFilter);
+};
 
 const isPriceInRange = (price, range) => {
   if (range === FILTER_VALUE_ANY) {
@@ -72,4 +78,4 @@ const setMapFilterClick = (data) => {
   mapFilter.addEventListener('change', debounce(() => updatePins(data)));
 };
 
-export { setMapFilterClick, filterOffers };
+export { setMapFilterClick, filterOffers, enableFilterForm };

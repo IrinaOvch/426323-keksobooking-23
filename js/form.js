@@ -84,8 +84,6 @@ const setInactiveState = () => {
 const setActiveState = () => {
   adForm.classList.remove('ad-form--disabled');
   enableFormFieldsets(adForm);
-  mapFilter.classList.remove('ad-form--disabled');
-  enableFormFieldsets(mapFilter);
   setAdressCoords();
   setPriceInputPlaceholder();
 };
@@ -244,4 +242,4 @@ const setFormListeners = () => {
   adForm.addEventListener('submit', formSubmitHandler);
 };
 
-export { setInactiveState, setActiveState, setFormListeners, setAdressCoords };
+export { setInactiveState, setActiveState, setFormListeners, setAdressCoords, enableFormFieldsets };
