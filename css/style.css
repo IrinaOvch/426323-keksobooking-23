@@ -1028,3 +1028,7 @@ fieldset {
 .hidden {
   display: none;
 }
+
+.invalid:invalid {
+  border: 4px solid red;
+}
