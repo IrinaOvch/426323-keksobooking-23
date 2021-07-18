@@ -1,6 +1,5 @@
 import { sendData } from './api.js';
 import { mainPin, resetMap } from './map.js';
-import { mapFilter } from './filter.js';
 import { setAvatarInputsListeners, clearPreviews } from './avatar.js';
 import { isEscPressed } from './utils.js';
 
@@ -30,6 +29,7 @@ const tryAgainButton = formSubmitErrorWindow.querySelector('.error__button');
 const addressInput = document.querySelector('#address');
 const formResetButton = document.querySelector('.ad-form__reset');
 const formSubmitButton = document.querySelector('.ad-form__submit');
+const mapFilter = document.querySelector('.map__filters');
 
 let hideFormSubmitAlert = null;
 let hideSuccessWindow = null;
