@@ -59,7 +59,7 @@ const isOfferMatchesFilter = (offer) => {
 
 const filterOffers = (offers) => {
   const filteredOffers = [];
-  for (let i = 0; i < offers.length || filteredOffers.length === RENDERED_OFFERS_AMOUNT; i++) {
+  for (let i = 0; i < offers.length && filteredOffers.length < RENDERED_OFFERS_AMOUNT; i++) {
     const {offer} = offers[i];
     if (isOfferMatchesFilter(offer)) {
       filteredOffers.push(offers[i]);
@@ -72,4 +72,4 @@ const setMapFilterClick = (data) => {
   mapFilter.addEventListener('change', debounce(() => updatePins(data)));
 };
 
-export { mapFilter, setMapFilterClick, filterOffers };
+export { setMapFilterClick, filterOffers };

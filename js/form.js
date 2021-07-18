@@ -2,6 +2,7 @@ import { sendData } from './api.js';
 import { mainPin, resetMap } from './map.js';
 import { mapFilter } from './filter.js';
 import { setAvatarInputsListeners, clearPreviews } from './avatar.js';
+import { isEscPressed } from './utils.js';
 
 const MIN_TITLE_LENGTH = 30;
 const DIGITS = 5;
@@ -28,6 +29,7 @@ const formSubmitErrorWindow = document.querySelector('#error').content.querySele
 const tryAgainButton = formSubmitErrorWindow.querySelector('.error__button');
 const addressInput = document.querySelector('#address');
 const formResetButton = document.querySelector('.ad-form__reset');
+const formSubmitButton = document.querySelector('.ad-form__submit');
 
 let hideFormSubmitAlert = null;
 let hideSuccessWindow = null;
@@ -88,6 +90,10 @@ const setActiveState = () => {
   setPriceInputPlaceholder();
 };
 
+const toggleInvalidStatus = (element) => {
+  element.classList.toggle('invalid');
+};
+
 const titleChangeHandler = (evt) => {
   const titleValueLength = evt.target.value.length;
 
@@ -102,13 +108,12 @@ const titleChangeHandler = (evt) => {
   if (titleValueLength >= MIN_TITLE_LENGTH &&  titleValueLength <= MAX_TITLE_LENGTH) {
     offerTitleInput.setCustomValidity('');
   }
-
   offerTitleInput.reportValidity('');
 };
 
 const priceChangeHandler = () => {
   if (offerPriceInput.value > MAX_PRICE) {
-    offerPriceInput.setCustomValidity(`Максимальная цена превышена на ${offerPriceInput.value - MAX_PRICE}₽`);
+    offerPriceInput.setCustomValidity(`Максимальная цена превышена на ${Number(offerPriceInput.value) - MAX_PRICE}₽`);
   } else if (offerPriceInput.value < MIN_PRICES[propertyTypeSelect.value]) {
     offerPriceInput.setCustomValidity(`Минимальная цена для данного типа жилья: ${MIN_PRICES[propertyTypeSelect.value]}₽`);
   } else {
@@ -133,6 +138,7 @@ const guestsAmountChangeHandler = () => {
 };
 
 const resetForm = () => {
+  adForm.querySelectorAll('.invalid').forEach((element) => toggleInvalidStatus(element));
   adForm.reset();
   resetMap();
   setAdressCoords();
@@ -152,7 +158,7 @@ const chechinTimeChangeHandler = (evt) => {
 // ошибка отправки формы
 
 const formSubmitErrorWindowKeydownHandler = (evt) => {
-  if (evt.key === 'Escape' || evt.key === 'Esc') {
+  if (isEscPressed(evt)) {
     hideFormSubmitAlert();
   }
 };
@@ -173,7 +179,7 @@ const showFormSubmitAlert = () => {
 // успешная отправка
 
 const successWindowKeydownHandler = (evt) => {
-  if (evt.key === 'Escape' || evt.key === 'Esc') {
+  if (isEscPressed(evt)) {
     hideSuccessWindow();
   }
 };
@@ -200,6 +206,16 @@ const formResetButtonClickHandler = (evt) => {
   resetForm();
 };
 
+const validationFormHandler = (evt) => {
+  toggleInvalidStatus(evt.target);
+};
+
+const formSubmitButtonClickHandler = () => {
+  guestsAmountChangeHandler();
+  priceChangeHandler();
+  adForm.addEventListener('invalid', validationFormHandler, true);
+};
+
 const formSubmitHandler = (evt) => {
   evt.preventDefault();
   guestsAmountChangeHandler();
@@ -211,6 +227,7 @@ const formSubmitHandler = (evt) => {
       showFormSubmitAlert,
       new FormData(evt.target),
     );
+    adForm.removeEventListener('invalid', validationFormHandler, true);
   }
 };
 
@@ -222,6 +239,7 @@ const setFormListeners = () => {
   checkinTimeSelect.addEventListener('change', chechinTimeChangeHandler);
   checkoutTimeSelect.addEventListener('change', chechinTimeChangeHandler);
   formResetButton.addEventListener('click', formResetButtonClickHandler);
+  formSubmitButton.addEventListener('click', formSubmitButtonClickHandler);
   setAvatarInputsListeners();
   adForm.addEventListener('submit', formSubmitHandler);
 };

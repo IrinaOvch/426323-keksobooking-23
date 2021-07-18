@@ -11,4 +11,6 @@ const debounce = (callback, timeoutDelay = DOBOUNCE_DELAY) => {
   };
 };
 
-export { getDeclOfNum, debounce };
+const isEscPressed = (evt) => evt.key === 'Escape' || evt.key === 'Esc';
+
+export { getDeclOfNum, debounce, isEscPressed };
